@@ -1,7 +1,16 @@
 <template>
-  <div>
-    <ProductListItem :products="allProducts" />
-  </div>
+  <v-container>
+    <v-row>
+      <v-col
+        v-for="product in allProducts"
+        :key="product.familyId"
+        cols="12"
+        md="3"
+      >
+        <ProductListItem :product="product" />
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
