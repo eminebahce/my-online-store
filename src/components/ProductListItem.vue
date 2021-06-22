@@ -24,7 +24,7 @@
         ></v-rating>
 
         <div class="grey--text ms-4">
-          {{ product.modelList[0].ratings }} ({{
+          {{ parseFloat(product.modelList[0].ratings) }} ({{
             product.modelList[0].reviewCount
           }})
         </div>
@@ -44,11 +44,11 @@
     <v-card-actions>
       <v-row align="center" justify="space-around">
         <v-btn
-          color="deep-purple lighten-2"
+          color="deep-purple accent-4"
           small
           dark
           class="mb-4 mt-4"
-          @click="addToCart"
+          @click="addToCart(product)"
         >
           Add to cart
           <v-icon right>mdi-basket</v-icon>
@@ -62,6 +62,15 @@
 export default {
   name: "ProductListItem",
   props: ["product"],
+
+  methods: {
+    addToCart(product) {
+      this.$router.push({
+        name: "OrderOverview",
+        params: { product: product },
+      });
+    },
+  },
 };
 </script>
 

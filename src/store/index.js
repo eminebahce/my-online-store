@@ -14,7 +14,6 @@ export default new Vuex.Store({
   actions: {
     getAllProducts({commit}) {
       url.get('/').then((response) => {
-        console.log('XXXXXXX',response.data.response.resultData.productList)
         commit('GET_ALL_PRODUCTS', response.data.response.resultData.productList)
       })
     }
