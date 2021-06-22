@@ -1,12 +1,27 @@
 <template>
   <div>
-    <h1>Product List</h1>
+    <ProductListItem :products="allProducts" />
   </div>
 </template>
 
 <script>
+import ProductListItem from "./ProductListItem";
+import { mapState } from "vuex";
+
 export default {
   name: "ProductList",
+  components: {
+    ProductListItem,
+  },
+  computed: {
+    ...mapState({
+      allProducts: (state) => state.allProducts,
+    }),
+  },
+
+  created() {
+    this.$store.dispatch("getAllProducts");
+  },
 };
 </script>
 
