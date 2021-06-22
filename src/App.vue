@@ -1,12 +1,52 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <!-- <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link> -->
-    </div>
-    <router-view />
-  </div>
+  <v-app>
+    <v-main>
+      <v-app-bar color="deep-purple accent-4" dense dark>
+        <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
+        <v-toolbar-title>My Online Store</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon>
+          <v-icon>mdi-basket</v-icon>
+        </v-btn>
+      </v-app-bar>
+      <v-navigation-drawer v-model="drawer" absolute temporary>
+        <v-list nav dense>
+          <v-list-item-group
+            v-model="group"
+            active-class="deep-purple--text text--accent-4"
+          >
+            <v-list-item>
+              <v-list-item-icon>
+                <v-icon>mdi-home</v-icon>
+              </v-list-item-icon>
+              <router-link to="/"
+                ><v-list-item-title>Products</v-list-item-title></router-link
+              >
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
+      </v-navigation-drawer>
+      <router-view />
+    </v-main>
+    <v-footer padless color="deep-purple accent-4" dense dark>
+      <v-col class="text-center" cols="12">
+        <h6>
+          {{ new Date().getFullYear() }} —
+          <strong>My online store</strong>
+        </h6>
+      </v-col>
+    </v-footer>
+  </v-app>
 </template>
+<script>
+export default {
+  name: "App",
+  data: () => ({
+    drawer: false,
+    group: null,
+  }),
+};
+</script>
 
 <style>
 </style>
