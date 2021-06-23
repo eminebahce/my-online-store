@@ -126,6 +126,7 @@ export default {
     placeOrder() {
       //dispatch action and save the info to the db
       //this.$refs.form.placeOrder();
+      this.$router.push("OrderConfirmation");
     },
   },
 };
