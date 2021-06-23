@@ -15,7 +15,7 @@
     <v-card-text>
       <v-row align="center" class="mx-0">
         <v-rating
-          :value="product.modelList[0].ratings"
+          :value="parseFloat(product.modelList[0].ratings)"
           color="amber"
           dense
           half-increments

@@ -8,8 +8,10 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@sanity/client": "^2.11.0",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "uuid": "^3.4.0",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
     "vuetify": "^2.5.4",

@@ -15,7 +15,7 @@ export default new Vuex.Store({
     getAllProducts({commit}) {
       url.get('/').then((response) => {
         commit('GET_ALL_PRODUCTS', response.data.response.resultData.productList)
-      })
+      }).catch(error => console.log(error))
     }
   },
   mutations: {

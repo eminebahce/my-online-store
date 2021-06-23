@@ -7,7 +7,7 @@
           ref="form"
           v-model="valid"
           lazy-validation
-          @submit.prevent="placeOrder"
+          @submit.prevent="saveData"
         >
           <v-text-field
             v-model="fullName"
@@ -35,9 +35,7 @@
             color="deep-purple accent-4"
             small
             dark
-            @click="placeOrder"
             type="submit"
-            :disabled="!valid"
           >
             Place Order
           </v-btn>
@@ -57,10 +55,7 @@
             ></v-progress-linear>
           </template>
 
-          <v-img
-            height="250"
-            :src="this.$route.params.product.modelList[0].thumbUrl"
-          ></v-img>
+          <v-img height="250" :src="product.thumbUrl"></v-img>
 
           <v-card-title>{{
             this.$route.params.product.fmyMarketingName
@@ -69,7 +64,7 @@
           <v-card-text>
             <v-row align="center" class="mx-0">
               <v-rating
-                :value="this.$route.params.product.modelList[0].ratings"
+                :value="parseFloat(product.ratings)"
                 color="amber"
                 dense
                 half-increments
@@ -78,23 +73,19 @@
               ></v-rating>
 
               <div class="grey--text ms-4">
-                {{
-                  parseFloat(this.$route.params.product.modelList[0].ratings)
-                }}
-                ({{ this.$route.params.product.modelList[0].reviewCount }})
+                {{ parseFloat(product.ratings) }}
+                ({{ product.reviewCount }})
               </div>
             </v-row>
 
             <div class="my-4 text-subtitle-1">
-              $ {{ this.$route.params.product.modelList[0].priceDisplay }} •
-              {{ this.$route.params.product.modelList[0].pviTypeName }},
-              {{ this.$route.params.product.modelList[0].pviSubtypeName }}
+              $ {{ product.priceDisplay }} • {{ product.pviTypeName }},
+              {{ product.pviSubtypeName }}
             </div>
 
             <div>
-              {{ this.$route.params.product.modelList[0].usp[0] }},
-              {{ this.$route.params.product.modelList[0].usp[1] }},
-              {{ this.$route.params.product.modelList[0].usp[2] }}
+              {{ product.usp[0] }}, {{ product.usp[1] }},
+              {{ product.usp[2] }}
             </div>
           </v-card-text>
         </v-card>
@@ -104,29 +95,99 @@
 </template>
 
 <script>
+import sanity from "../sanity";
+import { v4 as uuidv4 } from "uuid";
+
+const doc = {
+  _type: "order",
+  orderId: "",
+  orderDate: "",
+  total: 0,
+  customer: {
+    _type: "customer",
+    name: "",
+    address: "",
+    phoneNumber: "",
+  },
+  products: [
+    {
+      _type: "product",
+      _key: "",
+      name: "",
+      modal: "",
+      price: 0,
+      image: "",
+    },
+  ],
+};
+
 export default {
   name: "OrderOverview",
 
   data: () => ({
     valid: false,
     fullName: "",
-    nameRules: [(v) => !!v || "Full name is required"],
+    nameRules: [],
     telephone: "",
-    telephoneRules: [
-      (v) => !!v || "Telephone number is required",
-      (v) =>
-        /^\(?([+]31|0031|0)-?6(\s?|-)([0-9]\s{0,3}){8}$/.test(v) ||
-        "Telephone number must be valid",
-    ],
+    telephoneRules: [],
     address: "",
-    addressRules: [(v) => !!v || "Address is required"],
+    addressRules: [],
+    product: null,
   }),
 
+  created() {
+    this.product = this.$route.params.product.modelList[0];
+  },
+
+  watch: {
+    /* eslint-disable */
+    fullName(val) {
+      this.nameRules = [];
+    },
+    /* eslint-disable */
+    telephone(val) {
+      this.telephoneRules = [];
+    },
+    /* eslint-disable */
+    address(val) {
+      this.addressRules = [];
+    },
+  },
+
   methods: {
-    placeOrder() {
-      //dispatch action and save the info to the db
-      //this.$refs.form.placeOrder();
-      this.$router.push("OrderConfirmation");
+    saveData() {
+      this.nameRules = [(v) => !!v || "Full name is required"];
+      this.telephoneRules = [
+        (v) => !!v || "Telephone number is required",
+        (v) =>
+          /^\(?([+]31|0031|0)-?6(\s?|-)([0-9]\s{0,3}){8}$/.test(v) ||
+          "Telephone number must be valid",
+      ];
+      this.addressRules = [(v) => !!v || "Address is required"];
+      this.$refs.form.validate();
+
+      if (this.fullName && this.telephone && this.address !== "") {
+        doc.customer.name = this.fullName;
+        doc.customer.address = this.address;
+        doc.customer.phoneNumber = this.telephone;
+        doc.orderId = uuidv4();
+        doc.orderDate = new Date();
+        doc.products[0].name = this.$route.params.product.fmyMarketingName;
+        doc.products[0].modal = `${this.product.pviTypeName}, ${this.product.pviSubtypeName}`;
+        doc.products[0].price = parseFloat(this.product.priceDisplay);
+        doc.products[0].image = this.product.thumbUrl;
+        doc.products[0]._key = doc.orderId;
+
+        sanity
+          .create(doc)
+          .then((res) => {
+            this.$router.push({
+              name: "OrderConfirmation",
+              params: { id: res._id },
+            });
+          })
+          .catch((error) => console.log(error));
+      }
     },
   },
 };
