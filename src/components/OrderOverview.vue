@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-row>
+    <v-row class="justify-center">
       <v-col cols="12" md="4">
         <div class="text-h4 mb-10 mt-10">Customer Details</div>
         <v-form
@@ -31,20 +31,24 @@
           ></v-text-field>
 
           <v-btn
-            class="mt-4"
+            class="mt-5 ml-5"
             color="deep-purple accent-4"
             small
             dark
             type="submit"
           >
+            <v-icon class="px-2">mdi-basket</v-icon>
             Place Order
+          </v-btn>
+
+          <v-btn :to="{ path: '/' }" color="red" small dark class="ml-10 mt-5">
+            <v-icon class="px-2">mdi-cancel</v-icon>
+            Cancel
           </v-btn>
         </v-form>
       </v-col>
 
-      <v-spacer></v-spacer>
-
-      <v-col md="6" class="pl-15">
+      <v-col md="6" class="pl-15 ml-15">
         <div class="text-h4 mb-10 mt-10">Product Details Overview</div>
         <v-card :loading="loading" class="pa-2" max-width="380" tile>
           <template slot="progress">
@@ -155,6 +159,11 @@ export default {
   },
 
   methods: {
+    checkPhone(phone) {
+      return (
+        !!phone && /^\(?([+]31|0031|0)-?6(\s?|-)([0-9]\s{0,3}){8}$/.test(phone)
+      );
+    },
     saveData() {
       this.nameRules = [(v) => !!v || "Full name is required"];
       this.telephoneRules = [
@@ -166,7 +175,11 @@ export default {
       this.addressRules = [(v) => !!v || "Address is required"];
       this.$refs.form.validate();
 
-      if (this.fullName && this.telephone && this.address !== "") {
+      if (
+        this.fullName &&
+        this.checkPhone(this.telephone) &&
+        this.address !== ""
+      ) {
         doc.customer.name = this.fullName;
         doc.customer.address = this.address;
         doc.customer.phoneNumber = this.telephone;
@@ -183,7 +196,7 @@ export default {
           .then((res) => {
             this.$router.push({
               name: "OrderConfirmation",
-              params: { id: res._id },
+              params: { id: res._id, orderId: doc.orderId },
             });
           })
           .catch((error) => console.log(error));
