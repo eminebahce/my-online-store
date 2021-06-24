@@ -29,10 +29,13 @@
         >
           <p class="text-h7 mb-10">
             <span class="text-subtitle-2">{{ order.customer.name }}</span
-            >, thank you shopping with us. We have received your order, and is
-            preparing it for shipment to your
-            <span class="text-subtitle-2">{{ order.customer.address }}</span>
-            address.
+            >, thank you for shopping with us. We have received your order at
+            <span class="text-subtitle-2">{{
+              formateDateTime(order.orderDate)
+            }}</span
+            >, and it has been prepared for the shipment to your address:
+            <span class="text-subtitle-2">{{ order.customer.address }}</span
+            >.
           </p>
           <v-card max-width="500" outlined>
             <v-list-item three-line>
@@ -68,11 +71,11 @@
 
 <script>
 import sanity from "../sanity";
+import moment from "moment";
 
 const query = `*[_type == "order" && _id == $id]{
   orderId,
   orderDate,
-  total,
   customer,
   products
 }`;
@@ -88,6 +91,9 @@ export default {
     this.loadData();
   },
   methods: {
+    formateDateTime(date) {
+      return moment(date).format("MMMM Do YYYY, h:mm:ss a");
+    },
     loadData() {
       sanity
         .fetch(query, { id: this.$route.params.id })

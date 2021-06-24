@@ -106,7 +106,6 @@ const doc = {
   _type: "order",
   orderId: "",
   orderDate: "",
-  total: 0,
   customer: {
     _type: "customer",
     name: "",
@@ -119,7 +118,7 @@ const doc = {
       _key: "",
       name: "",
       modal: "",
-      price: 0,
+      price: "",
       image: "",
     },
   ],
@@ -187,7 +186,7 @@ export default {
         doc.orderDate = new Date();
         doc.products[0].name = this.$route.params.product.fmyMarketingName;
         doc.products[0].modal = `${this.product.pviTypeName}, ${this.product.pviSubtypeName}`;
-        doc.products[0].price = parseFloat(this.product.priceDisplay);
+        doc.products[0].price = this.product.priceDisplay;
         doc.products[0].image = this.product.thumbUrl;
         doc.products[0]._key = doc.orderId;
 
